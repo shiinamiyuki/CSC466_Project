@@ -1,6 +1,6 @@
 # CSC 466 Project: Comparing Various Methods on Solving Inverse Kinematics
 
-Most of the work are done in `src/ik_solvers.cpp`
+Most of the work are done in `src/ik_solvers.cpp`. Other code are based on https://github.com/alecjacobson/computer-graphics-kinematics
 
 ## How to build
 
