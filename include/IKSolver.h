@@ -43,6 +43,5 @@ std::shared_ptr<IKSolver> create_gradient_descent_solver();
 std::shared_ptr<IKSolver> create_BFGS_solver();
 std::shared_ptr<IKSolver> create_Newton_solver();
 std::shared_ptr<IKSolver> create_Gauss_Newton_solver();
-std::shared_ptr<IKSolver> create_JI_solver();
 
 #endif // KINEMATICS_IKSOLVER_H
