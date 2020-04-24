@@ -148,8 +148,8 @@ int main(int argc, char *argv[]) {
   v.data_list[skeleton_id].set_mesh(SV, SF);
   v.data_list[skeleton_id].set_colors(SC);
   v.data_list[skeleton_id].set_face_based(true);
-  v.core.animation_max_fps = 30.;
-  v.core.is_animating = true;
+  v.core().animation_max_fps = 30.;
+  v.core().is_animating = true;
 
   double anim_last_t = igl::get_seconds();
   double anim_t = 0;
@@ -299,7 +299,7 @@ int main(int argc, char *argv[]) {
     } else
     // Forward Kinematice animation
     {
-      if (v.core.is_animating) {
+      if (v.core().is_animating) {
         const double now = igl::get_seconds();
         anim_t += now - anim_last_t;
         anim_last_t = now;
@@ -315,11 +315,11 @@ int main(int argc, char *argv[]) {
 
   // Record mouse information on click
   v.callback_mouse_down = [&](igl::opengl::glfw::Viewer &, int, int) -> bool {
-    Eigen::RowVector3f last_mouse(mouse_x, v.core.viewport(3) - mouse_y, 0);
+    Eigen::RowVector3f last_mouse(mouse_x, v.core().viewport(3) - mouse_y, 0);
     // Move closest control point
     Eigen::MatrixXf CP;
-    igl::project(MapRXd(xb0.data(), xb0.size() / 3, 3), v.core.view,
-                 v.core.proj, v.core.viewport, CP);
+    igl::project(MapRXd(xb0.data(), xb0.size() / 3, 3), v.core().view,
+                 v.core().proj, v.core().viewport, CP);
     Eigen::VectorXf D = (CP.rowwise() - last_mouse).rowwise().norm();
     sel = (D.minCoeff(&sel) < 30) ? sel : -1;
     if (sel != -1) {
@@ -344,11 +344,11 @@ int main(int argc, char *argv[]) {
     if (sel != -1) {
       Eigen::Vector3f drag_scene, last_scene;
       igl::unproject(
-          Eigen::Vector3f(_mouse_x, v.core.viewport(3) - _mouse_y, mouse_z),
-          v.core.view, v.core.proj, v.core.viewport, drag_scene);
+          Eigen::Vector3f(_mouse_x, v.core().viewport(3) - _mouse_y, mouse_z),
+          v.core().view, v.core().proj, v.core().viewport, drag_scene);
       igl::unproject(
-          Eigen::Vector3f(mouse_x, v.core.viewport(3) - mouse_y, mouse_z),
-          v.core.view, v.core.proj, v.core.viewport, last_scene);
+          Eigen::Vector3f(mouse_x, v.core().viewport(3) - mouse_y, mouse_z),
+          v.core().view, v.core().proj, v.core().viewport, last_scene);
       xb0.block(sel * 3, 0, 3, 1) += (drag_scene - last_scene).cast<double>();
     }
     mouse_x = _mouse_x;
@@ -384,8 +384,8 @@ int main(int argc, char *argv[]) {
       run_test = true;
     }
     case ' ':
-      v.core.is_animating = !v.core.is_animating;
-      if (v.core.is_animating) {
+      v.core().is_animating = !v.core().is_animating;
+      if (v.core().is_animating) {
         // Reset clock
         anim_last_t = igl::get_seconds();
       }

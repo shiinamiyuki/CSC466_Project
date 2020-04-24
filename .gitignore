@@ -36,3 +36,4 @@ build/*
 file_watcher
 solution/*
 cmake-*/
+.idea
