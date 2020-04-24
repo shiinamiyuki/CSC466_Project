@@ -1,3 +1,36 @@
+# CSC 466 Project: Comparing Various Methods on Solving Inverse Kinematics
+
+## How to build
+
+Requirement: C++11 compatible compiler and CMake
+
+```
+git clone --recursive https://github.com/shiinamiyuki/CSC466_Project
+cd CSC466_Project
+mkdir build
+cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+make
+./kinematics ../data/beast.json
+```
+
+
+
+## Command line arguments
+
+```
+./kinematics filename [-s gd|bfgs|gauss] [--tol grad-tol E-tol]
+./random_test filename [-s gd|bfgs|gauss] [--tol grad-tol E-tol] [-o output-filename] [--gui] [--no-gui] [-n num-tests]
+```
+
+
+
+Press 'P' to start random tests when running `random_test`
+
+# README of Original Assignment
+
+
+
 # Computer Graphics – Kinematics
 
 > **To get started:** Clone this repository using
@@ -262,7 +295,6 @@ $$\a = \left(\begin{array}{c}
 θ_{m3}
 \end{array}\right)
 $$
-
 then we can ask for the best vector of angles $θ$. Best-ness must be quantified
 by an cost/energy/obective-function $E$. This energy is typically first written
 with respect to the (global, non-relative) pose positions of certains bones
@@ -272,25 +304,20 @@ bone of the skeletal tree, called an [end
 effector](https://en.wikipedia.org/wiki/Robot_end_effector)). For example, we 
 then we could design our energy to measure the squared distance between the pose
 tip $\x_b$ of some bone $b$ and a desired goal location $\q∈\R³$:
-
 $$
 E(\x_b) = ‖\x_b - \q‖².
 $$
-
 Using forward kinematics, we can express $\x_b$ and in turn $E$ with respect to
 relative rotations: 
-
 $$
 \x_b(\a) = \T_b \hat{\d}_b
 $$
 where $\T_b$ depends on $θ_{b1},θ_{b2},θ_{b2}$ and $\T_{p_b}$ which depends on 
 $θ_{p_b1},θ_{p_b2},θ_{p_b2}$. In this way our energy can be written as a
 function of $\a$:
-
 $$
 E(\x_b(\a)) = ‖\x_b(\a) - \q‖².
 $$
-
 We can design arbitrarily complex energies to satisfy our interaction needs. In
 this assignment, we consider that there is a list of constrained end effectors
 $b = \{b₁,b₂,…,b_k\}$ and our objective is that all selected end effectors $b_i$
@@ -298,14 +325,12 @@ go to their prescribed locations (provided by the mouse-drag UI).
 using the simple squared distance measure above.
 
 So, over all choices of $\a$ we'd like to optimize:
-
 $$
 \min_{\a} \quad
 \underbrace{
 ∑\limits_{i=1}\^k ‖\x_{b_i}(\a) - \hat{\x}_{b_i}‖²
 }_{E(\x_b (\a))}
 $$
-
 <!--
 Our energy will have two terms.
 
@@ -335,7 +360,6 @@ simple squared distance measure above.
 
 The goal of inverse kinematics is to minimize the sum of these energies over all
 choices of $\a$:
-
 $$
 \min_{\a} \quad
 \underbrace{
@@ -355,7 +379,6 @@ $$
 These would ensure that our joint cannot twist, and can only bend in one direction.
 
 So our full optimization problem becomes 
-
 $$
 \min\_{\a\^{\text{min}} ≤ \a ≤
 \a\^{\text{max}}}
@@ -386,18 +409,14 @@ direction that goes downhill.
 
 So, we iteratively take a step in the _negative_ gradient direction of our
 objective function $E(\x(\a))$:
-
 $$
 \a ← \a - σ \left(\frac{dE(\x(\a))}{d\a}\right)^T
 $$
-
 Applying the [chain rule](https://en.wikipedia.org/wiki/Chain_rule), this
 iteration becomes
-
 $$
 \a ← \a - σ \left(\frac{d\x(\a)}{d\a}\right)^T\left(\frac{dE(\x)}{d\x}\right)
 $$
-
 where $\frac{dE}{d\a} ∈ \R^{|\a|}$,
 $\frac{dE}{d\x} ∈ \R^{|\x|}$, and $\frac{d\x}{d\a} ∈ \R^{|\x| × |\a|}$
 
@@ -406,17 +425,13 @@ depend on the choice of energy $E$. We call this matrix of changes the kinematic
 [Jacobian](https://en.wikipedia.org/wiki/Jacobian_matrix_and_determinant), $\J ∈
 \R^{|\x| × |\a|}$:
 
-
 $$
 \J = \frac{d\x}{d\a}.
 $$
-
 Written in terms of $\J$ our step becomes,
-
 $$
 \a ← \a - σ \J^\transpose\left(\frac{dE(\x)}{d\x}\right)
 $$
-
 > **Question:** Can we take an arbitrarily large step $σ>>0$?
 >
 > **Hint:** What if we just need to change $\a$ by a small, non-zero amount?
@@ -430,17 +445,13 @@ point](https://en.wikipedia.org/wiki/Stationary_point) and likely at a minimum.
 
 To ensure that our bounds are obeyed, after each step we need to _project_ onto
 our constraints by snapping each value to its respective bound if necessary:
-
 $$
 \a\_i ← \max[\a\^\text{min}_i, \min[\a\^\text{max}\_i,\a\_i]].
 $$
-
 We'll refer to this as a projection filter acting on the entire vector $\a$:
-
 $$
 \a ← \text{proj}(\a).
 $$
-
 
 > #### Newton's method
 > 
@@ -570,7 +581,6 @@ the result of forward kinematics and not just a math expression, it's not
 immediately obvious how to determine its derivatives. However, a derivative is
 nothing more than the limit of a small change output divided by a small change
 in the input:
-
 $$
 \J_{i,j} = \lim_{h → 0} \frac{\x_i(\a+h δ_j) - \x_i(\a)}{h},
 $$
@@ -582,7 +592,6 @@ difference](https://en.wikipedia.org/wiki/Finite_difference) approximation:
 $$
 \J_{i,j} \approx  \frac{\x_i(\a+h δ_j) - \x_i(\a)}{h}.
 $$
-
 For inverse kinematics, we will need to compute $\x_i(\a+h δ_j)$ once for each
 Euler angle of each bone $j$. This requires $3m$ calls to our forward kinematics
 function (each with a slightly different input), which is in turn $O(m)$. This
@@ -621,20 +630,16 @@ makes the total cost $O(m²)$ to fill in our $\J$ matrix.
 Whether we're using gradient descent, Newton's method or Gauss-Newton, we a
 generally _attempting_ improving our guess by iteratively moving in a descent
 direction $∆\a$, followed by projecting onto constraints:
-
 $$
 \a ← \text{proj}(\a + ∆\a).
 $$
-
 Despite our best efforts, this step is not guaranteed to actually decrease
 our energy $E$. We can think of the descent _direction_ $∆\a$ as defining a line (or really
 a _ray_) and we'd like to find a positive amount $σ$ to move along this line that actually
 does decrease the energy:
-
 $$
 E(\text{proj}(\a + σ ∆\a)) < E(\a).
 $$
-
 While there exists an optimal step $σ$, we don't want to spend too long finding
 it as we would be better off spending our computational efforts improving the
 descent _direction_ for the next step. So, starting with a large value $σ$
@@ -677,7 +682,6 @@ piecewise-constant weights lead to a piece-wise rigid deformation.
 The "pose" position $\v_i$ of this vertex $i$ will be computed as a weighted
 average or linear combination of each bone's pose transformation $\T_j$ applied
 to the vertex's rest position $\hat{\v}_i$:
-
 $$
 \v_i = 
 \sum\limits\^{m}_{j=1}
