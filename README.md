@@ -13,7 +13,7 @@ mkdir build
 cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release
 make
-./kinematics ../data/beast.json
+./kinematics ../data/beast.json -s bfgs
 ```
 
 
