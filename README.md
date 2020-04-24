@@ -1,5 +1,7 @@
 # CSC 466 Project: Comparing Various Methods on Solving Inverse Kinematics
 
+Most of the work are done in `src/ik_solvers.cpp`
+
 ## How to build
 
 Requirement: C++11 compatible compiler and CMake
